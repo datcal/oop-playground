@@ -1,0 +1,91 @@
+version: '3'
+
+networks:
+  app:
+
+services:
+  site:
+    build:
+        context: .
+        dockerfile: nginx.dockerfile
+    container_name: nginx-app
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www/html:delegated
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - app
+
+  mysql:
+    image: mysql:5.7.22
+    container_name: mysql-app
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: homestead
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - app
+
+  php:
+    build:
+      context: .
+      dockerfile: php.dockerfile
+    container_name: php-app
+    volumes:
+      - .:/var/www/html:delegated
+    networks:
+      - app
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-app
+    links:
+      - mysql:mysql
+    ports:
+      - 8080:80
+    environment:
+      MYSQL_USERNAME: homestead
+      MYSQL_ROOT_PASSWORD: secret
+      PMA_HOST: mysql
+    networks:
+      - app
+
+  composer:
+    build:
+        context: .
+        dockerfile: composer.dockerfile
+    container_name: composer-app
+    volumes:
+        - .:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+        - php
+    user: app
+    entrypoint: ['composer', '--ignore-platform-reqs']
+    networks:
+        - app
+
+  phpunit:
+    build:
+      context: .
+      dockerfile: phpunit.dockerfile
+    container_name: phpunit-app
+    volumes:
+      - .:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - php
+    user: app
+    entrypoint: vendor/bin/phpunit
+    networks:
+      - app

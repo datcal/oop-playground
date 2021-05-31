@@ -1,0 +1,29 @@
+{
+    "name": "datcal/oop_playground",
+    "description": "oop",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Burak Hamza",
+            "email": "burakhamza@mail.ru"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "datcal\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "datcal\\Tests\\": "tests/"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^7",
+        "sempro/phpunit-pretty-print" : "*"
+    },
+    "require": {
+        "squizlabs/php_codesniffer": "*"
+    }
+}
